@@ -1,0 +1,131 @@
+# Documentação do Jogo Roguelike em Pygame Zero
+
+Este documento fornece uma visão geral da estrutura e do código do jogo roguelike criado com Pygame Zero. Ele descreve os principais arquivos (`main.py`, `hero.py`, `enemy.py`) e suas funcionalidades.
+
+## Arquivo `main.py`
+
+Este é o arquivo principal do jogo, responsável por inicializar o jogo, gerenciar os estados do jogo (menu e jogo principal), lidar com a entrada do usuário, atualizar a lógica do jogo e desenhar os elementos na tela.
+
+### Imports
+
+O arquivo importa as seguintes bibliotecas e módulos:
+
+* `pgzrun`: Biblioteca do Pygame Zero para simplificar o desenvolvimento de jogos.
+* `time`: Módulo para funções relacionadas ao tempo, usado para controlar o delta time (`dt`).
+* `Hero`: Classe definida no arquivo `hero.py`, representando o personagem principal (veja a seção "Classe `Hero` (`hero.py`)").
+* `Enemy`: Classe definida no arquivo `enemy.py`, representando os inimigos (veja a seção "Classe `Enemy` (`enemy.py`)").
+* `check_collision`: Função definida no arquivo `enemy.py` para verificar colisões entre o herói e os inimigos (veja a seção "Função `check_collision(hero, enemies)` (`enemy.py`)").
+* `pygame.mixer`: Módulo do Pygame para controlar áudio.
+* `pygame.Rect`: Classe do Pygame para representar áreas retangulares.
+
+### Inicialização
+
+* `pygame.mixer.init()`: Inicializa o mixer de áudio do Pygame.
+* `WIDTH = 800`, `HEIGHT = 600`: Define as dimensões da janela do jogo.
+
+### Estados do Jogo
+
+* `MENU = 0`, `GAME = 1`: Constantes representando os diferentes estados do jogo.
+* `game_state = MENU`: Variável que armazena o estado atual do jogo, inicialmente no menu.
+
+### Elementos do Menu
+
+* `menu_items`: Uma lista de strings com as opções do menu.
+* `menu_y_positions`: Uma lista com as coordenadas Y de cada item do menu.
+* `menu_font_size`, `menu_color`: Define o tamanho da fonte e a cor dos textos do menu.
+* `selected_item = 0`: Índice do item atualmente selecionado no menu.
+
+### Variáveis do Jogo
+
+* `hero`: Uma instância da classe `Hero`, posicionada no centro da tela.
+* `enemies`: Uma lista de instâncias da classe `Enemy`, com suas posições iniciais e áreas de patrulha.
+* `last_time`: Variável para armazenar o tempo do último frame, usada para calcular o `dt`.
+* `game_over = False`: Flag para indicar se o jogo terminou.
+* `keys_pressed`: Um conjunto para armazenar as teclas que estão atualmente pressionadas.
+* `music_enabled = True`: Flag para controlar se a música está ligada ou desligada.
+* `can_take_damage = True`: Flag para controlar se o herói pode receber dano.
+* `damage_cooldown = 3.0`: Tempo de cooldown (em segundos) após o herói receber dano.
+* `last_damage_time = 0.0`: Variável para armazenar o tempo em que o herói recebeu dano pela última vez.
+
+### Áudio
+
+* `music_files`: Uma lista de caminhos para os arquivos de música de fundo.
+* `music_loaded = False`: Flag para indicar se a música foi carregada com sucesso.
+* O código tenta carregar os arquivos de música e reproduzir o primeiro que for carregado com sucesso em loop.
+* `collision_sound`: Variável para armazenar o objeto de som de colisão.
+* O código tenta carregar o arquivo de som de colisão.
+
+### Carregamento do Fundo
+
+* `background`: Uma instância da classe `Actor` do Pygame Zero, usando a imagem 'background'.
+* `background.pos`: Posiciona o fundo no centro da tela.
+
+### Funções (`main.py`)
+
+* `update()`: Atualiza a lógica do jogo a cada frame, incluindo movimentação, colisões e estados do jogo.
+* `draw()`: Desenha os elementos do jogo na tela a cada frame, dependendo do estado do jogo.
+* `on_key_down(key)`: Lida com eventos de pressionamento de teclas, principalmente para navegação no menu e controle do herói.
+* `on_key_up(key)`: Lida com eventos de liberação de teclas (atualmente apenas para o controle do herói).
+* `on_mouse_down(pos)`: Lida com eventos de clique do mouse no menu.
+* `pgzrun.go()`: Inicia o loop principal do Pygame Zero.
+
+## Classe `Hero` (`hero.py`)
+
+Esta classe define o personagem principal do jogo.
+
+### Atributos
+
+* `idle_images`: Lista de nomes de imagens para a animação quando o herói está parado.
+* `walk_images`: Lista de nomes de imagens para a animação quando o herói está se movendo.
+* `actor`: Objeto `Actor` do Pygame Zero que representa o sprite do herói na tela.
+* `image_index`: Índice da imagem atual que está sendo exibida na animação.
+* `animation_timer`: Contador de tempo para controlar a velocidade da animação.
+* `animation_interval`: Intervalo de tempo (em segundos) entre cada frame da animação.
+* `speed`: Velocidade de movimento do herói em pixels por segundo.
+* `velocity`: Lista `[vx, vy]` representando a velocidade horizontal e vertical atual do herói.
+* `health`: Inteiro que armazena a vida atual do herói.
+
+### Métodos
+
+* `__init__(self, pos)`: Inicializa uma nova instância do herói na posição `pos`.
+* `update(self, dt, keys_pressed)`: Atualiza a posição e a animação do herói com base no tempo decorrido (`dt`) e nas teclas pressionadas (`keys_pressed`).
+* `draw(self)`: Desenha o sprite do herói na tela.
+
+## Classe `Enemy` (`enemy.py`)
+
+Esta classe define os inimigos que o jogador enfrentará no jogo.
+
+### Atributos
+
+* `idle_images`: Lista de nomes de imagens para a animação quando o inimigo está parado.
+* `walk_images`: Lista de nomes de imagens para a animação quando o inimigo está se movendo.
+* `actor`: Objeto `Actor` do Pygame Zero que representa o sprite do inimigo na tela.
+* `patrol_area`: Objeto `Rect` do Pygame que define a área onde o inimigo patrulha.
+* `speed`: Velocidade de movimento do inimigo em pixels por segundo.
+* `direction`: Lista `[dx, dy]` representando a direção atual do movimento do inimigo (-1, 0 ou 1 para cada eixo).
+* `image_index`: Índice da imagem atual que está sendo exibida na animação.
+* `animation_timer`: Contador de tempo para controlar a velocidade da animação.
+* `animation_interval`: Intervalo de tempo (em segundos) entre cada frame da animação.
+* `last_move_time`: Tempo da última vez que a direção do inimigo foi alterada.
+* `move_interval`: Intervalo de tempo (em segundos) entre as mudanças de direção do inimigo.
+
+### Métodos
+
+* `__init__(self, pos, patrol_area)`: Inicializa uma nova instância do inimigo na posição `pos` e define sua área de patrulha `patrol_area`.
+* `update(self, dt, hero_pos)`: Atualiza a posição e a animação do inimigo com base no tempo decorrido (`dt`) e na posição do herói (`hero_pos`). A IA básica de patrulha (movimento aleatório dentro da área de patrulha com mudanças de direção periódicas) e a lógica de animação são gerenciadas aqui.
+* `draw(self)`: Desenha o sprite do inimigo na tela.
+
+## Função `check_collision(hero, enemies)` (`enemy.py`)
+
+Esta função verifica se houve alguma colisão entre o herói e qualquer um dos inimigos na lista.
+
+### Parâmetros
+
+* `hero`: Uma instância da classe `Hero` (definida em `hero.py`).
+* `enemies`: Uma lista de instâncias da classe `Enemy`.
+
+### Retorno
+
+Retorna `True` se o objeto `actor` do herói colidir com o objeto `actor` de algum dos inimigos na lista, e `False` caso contrário.
+
+Este conteúdo combina as informações dos três arquivos main, hero e enemy.
