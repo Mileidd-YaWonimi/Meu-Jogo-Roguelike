@@ -1,4 +1,4 @@
-Meu Jogo Roguelike (Nome do seu repositório - ajuste se necessário)
+Meu Jogo Roguelike 
 
 Este é um jogo roguelike simples criado utilizando a biblioteca Pygame Zero para Python. O jogador controla um herói com o objetivo de sobreviver em um ambiente repleto de inimigos.
 
